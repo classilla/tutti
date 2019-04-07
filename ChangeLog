@@ -1,0 +1,69 @@
+1.0 initial release as TutorEm
+
+1.2 initial release as Tutti II
+    port to OS X
+    initial tape support with traps and OS integration
+    fix colour bug in hi-res mode
+    hacks for sprites
+    improve performance by skipping frames with no changes
+    clean up 9995 timing loop
+
+1.5 second Tutti II release
+    support for paste as keystrokes
+    AltiVec acceleration (G4/G5) for 9918 emulation
+    2x display (with AltiVec scaling on G4/G5)
+    multiple fixes to the 9995 core
+    display list 9918 sprite algorithm is now scanline correct
+    fix crash in tape save dialogue
+    faster writes to mmapped i/o
+    enabled _/@ key (mapped to backquote key)
+    additional alternate MOD key for keyboard without Right-Opt (iBook G4, etc)
+	to numeric keyboard ENTER
+    you can use both shift keys now (both map to "SHIFT")
+    further improvements to timing loop
+    debugger can emit instruction stream to stdout (toggled with F7)
+    Command-M actually does minimize the window now
+    9995 STWP instruction correctly disassembled
+    fix visual glitch with "2" glyph in debugger
+
+2.0 third Tutti II release ("Tutti Two Two Meets The Hooded Fang")
+    This version introduces dramatically improved emulation and fixes a lot of
+    bugs, including BASIC SOUND ERR 2, crashes, and errors with tape output.
+
+    source code refactor to make system more modular and implement debugging
+    custom SN76489AN sound emulation, including noise channel
+    massively overhauled 9995 emulation with ALU core modified from MAME/MESS
+        (this fixed a lot of bugs just by itself!)
+    9918ANL palette recalibrated
+    numeric keypad keys "84560." emulate joystick (0 and . are SL/SR)
+    9995 decremeter actually works to spec using a custom algorithm
+    9995 decrementer IRQ 3 now independent of VDP sync (as on a real system)
+    ... so the menu option is now "Sync IRQ3 to System Clock"
+    timing loop recalibrated against a real Tutor
+    screen updates are even faster
+    screen updates are less frequent to improve performance/reduce tearing
+    stuck final sync bits are now flushed, fixing issues with real machine LOAD
+    illegal instructions hit 9995 debugger (this includes the BASIC COLOR bug)
+    sprites scrolling under top border no longer display garbage
+    potential crash in sprite subsystem wallpapered
+    lots of old code removed
+
+2.2 fourth Tutti II release ("Tutti Two Point Two Meets The Hooded Fang")
+    This version introduces the 64-bit macOS and 32-bit Windows versions,
+    ironically porting Tutti back to the platform it started from (as
+    TutorEm), and makes other portability updates for future ports.
+
+    working Win32 port (compatible with Wine and Windows 98 on up)
+	(crossbuilt with mxe: if you make a Visual Studio version, PR me)
+    working macOS x86_64 port for 10.12+ because Apple wants to make the Mac
+	completely irrelevant by making it incompatible with older existing
+	32-bit software but I don't care because I'm going Linux eat me Tim
+    ... btw, the existing 32-bit Universal 10.4-10.13 build is still supported
+    paste as keystrokes now can be aborted (Command-V or Ctrl-V during paste)
+    debugger now can show the screen (S to toggle)
+    64-bit fixes
+    fix issue where decrementer routine dropped clock pulses
+    fix issue where paste as keystrokes could munge the keyboard state
+    many compiler warnings cleaned up
+    more old code removed
+

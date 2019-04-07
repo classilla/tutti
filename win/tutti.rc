@@ -1,0 +1,23 @@
+101 ICON "assets/tutti.ico"
+1 VERSIONINFO
+FILEVERSION     2,2,0,0
+PRODUCTVERSION  2,2,0,0
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904E4"
+    BEGIN
+      VALUE "FileDescription", "A great Tomy Tutor emulator."
+      VALUE "FileVersion", "2.2"
+      VALUE "InternalName", "tutti"
+      VALUE "LegalCopyright", "Cameron Kaiser and Ian Gledhill"
+      VALUE "OriginalFilename", "tutti.exe"
+      VALUE "ProductName", "Tutti II"
+      VALUE "ProductVersion", "2.2"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x409, 1252
+  END
+END

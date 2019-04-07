@@ -1,0 +1,51 @@
+# This is for Xcode 2.5 on Tiger. It builds a three-headed binary compatible
+# with 10.4 through 10.14 on PowerPC and Intel until Apple killed 32-bit.
+# It has AltiVec acceleration for G4 and G5 machines. The SDL framework should
+# be installed (however, the special universal dylib in libs/ is actually
+# used for building).
+
+#CC=gcc
+#CC=gcc-mp-4.6 -g
+#CC=gcc -arch ppc7450 -mtune=G5
+CC=gcc -arch ppc750 -arch ppc7400 -arch i386
+#CFLAGS=-I. -g -DDEBUG=1
+#CFLAGS=-I. -g -O3 -mdynamic-no-pic
+CFLAGS=-I. -O3 -mdynamic-no-pic
+OBJS=tutorem/Core.o tutorem/Debugger.o tutorem/Disassemble.o osx/SDLMain.o tutorem/TMS9918ANL.o tutorem/TMS9995.o tutorem/SN76489AN.o osx/tutti.o
+DISAS_OBJS=tutorem/Disassemble.o osx/dutti.o
+
+_default: dutti tutti libs/SDL assets/tutti.icns osx/Info.plist
+	cp libs/SDL .
+	cp roms/tutor*.bin .
+	install_name_tool -change @executable_path/../Frameworks/SDL.framework/Versions/A/SDL @executable_path/SDL SDL
+	install_name_tool -change @executable_path/../Frameworks/SDL.framework/Versions/A/SDL @executable_path/SDL tutti
+	rm -rf bin
+	mkdir -pv bin/t2.app/Contents/MacOS
+	mkdir -pv bin/t2.app/Contents/Resources
+	cp roms/tutor*.bin bin/t2.app/Contents/Resources/
+	cp assets/tutti.icns bin/t2.app/Contents/Resources/
+	cp libs/SDL bin/t2.app/Contents/MacOS/
+	cp tutti bin/t2.app/Contents/MacOS/
+	strip bin/t2.app/Contents/MacOS/tutti
+	cp dutti bin/t2.app/Contents/Resources/
+	strip bin/t2.app/Contents/Resources/dutti
+	cp osx/Info.plist bin/t2.app/Contents
+	ditto bin/t2.app bin/Tutti\ II.app
+	rm -rf bin/t2.app
+#	zip tutti.zip tutti dutti SDL tutor*.bin
+#	cp tutti.zip /Library/WebServer/Documents/arc
+
+clean:
+	rm -rf $(OBJS) $(DISAS_OBJS) dutti tutti SDL *.bin tutti.zip bin/*
+
+dutti: $(DISAS_OBJS)
+	$(CC) -isysroot /Developer/SDKs/MacOSX10.4u.sdk -o dutti $(DISAS_OBJS)
+
+tutti: $(OBJS) sys.h
+	$(CC) -framework Cocoa -framework SDL -framework ApplicationServices -isysroot /Developer/SDKs/MacOSX10.4u.sdk -o tutti $(OBJS)
+
+%.o: %.c
+	$(CC) -c -o $@ $< $(CFLAGS)
+%.o: %.m
+	$(CC) -DSDL_USE_CPS=1 -c -o $@ $< $(CFLAGS)
+

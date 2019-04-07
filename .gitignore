@@ -1,0 +1,15 @@
+dutti
+tutti
+bin/*
+SDL
+SDL/*
+*.o
+*.bin
+*.exe
+*.zip
+*.res
+*.dylib
+*.dSYM
+*.dSYM/*
+.DS_Store
+

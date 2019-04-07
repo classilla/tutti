@@ -1,0 +1,55 @@
+# This is for building Tutti on macOS 10.12+ with clang 9.0 or later. It
+# requires clang and the command line build tools, as well as a build of
+# SDL-1.2.15 in ../SDL-1.2.15. It statically links SDL into the binary.
+
+SDL_HOME=../SDL-1.2.15
+CC=clang
+
+# Use old gcc inline semantics, which we need for compatibility with gcc 4
+# which we still support for PowerPC OS X. The easiest way is to ask for GNU89.
+#CFLAGS=-I. -g -I./SDL -std=gnu89 -DDEBUG=1
+#CFLAGS=-I. -O3 -I./SDL -std=gnu89 -DDEBUG=1
+#CFLAGS=-I. -I./SDL -std=gnu89 -DDEBUG=1
+#CFLAGS=-I. -I./SDL -std=gnu89
+CFLAGS=-I. -O3 -I./SDL -std=gnu89
+
+OBJS=tutorem/Core.o tutorem/Debugger.o tutorem/Disassemble.o osx/SDLMain.o tutorem/TMS9918ANL.o tutorem/TMS9995.o tutorem/SN76489AN.o osx/tutti.o
+DISAS_OBJS=tutorem/Disassemble.o osx/dutti.o
+
+_default: dutti tutti osx/Info.plist assets/tutti.icns
+	cp roms/tutor*.bin .
+	rm -rf bin
+	mkdir -pv bin/t2.app/Contents/MacOS
+	mkdir -pv bin/t2.app/Contents/Resources
+	cp roms/tutor*.bin bin/t2.app/Contents/Resources/
+	cp assets/tutti.icns bin/t2.app/Contents/Resources/
+	cp tutti bin/t2.app/Contents/MacOS/
+	cp dutti bin/t2.app/Contents/MacOS/
+	strip bin/t2.app/Contents/MacOS/tutti
+	strip bin/t2.app/Contents/MacOS/dutti
+	cp osx/Info.plist bin/t2.app/Contents
+	ditto bin/t2.app bin/Tutti\ II.app
+	rm -rf bin/t2.app
+clean:
+	rm -rf $(OBJS) $(DISAS_OBJS) dutti tutti SDL SDL.dylib *.bin tutti.zip bin/*
+
+dutti: $(DISAS_OBJS) Makefile.macos
+	$(CC) -o dutti $(DISAS_OBJS)
+
+# Carbon is still needed for some of the keyboard handling in SDL.
+# So much for deprecation!
+tutti: $(OBJS) sys.h Makefile.macos
+	$(CC) -framework Cocoa -framework ApplicationServices \
+		-framework IOKit \
+		-framework AudioUnit \
+		-framework OpenGL \
+		-framework Carbon \
+		$(SDL_HOME)/build/.libs/libSDL.a -o tutti $(OBJS)
+
+%.o: %.c SDL/SDL.h
+	$(CC) -c -o $@ $< $(CFLAGS)
+%.o: %.m SDL/SDL.h
+	$(CC) -c -o $@ $< $(CFLAGS)
+SDL/SDL.h:
+	ln -s $(SDL_HOME)/include SDL
+

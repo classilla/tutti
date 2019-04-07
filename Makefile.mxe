@@ -1,0 +1,38 @@
+# This is for crossbuilding the Win32 port with mxe on macOS and Linux.
+
+MXE_ROOT=$(HOME)/mxe
+CC=$(MXE_ROOT)/usr/bin/i686-w64-mingw32.static-gcc
+WINDRES=$(MXE_ROOT)/usr/bin/i686-w64-mingw32.static-windres
+STRIP=$(MXE_ROOT)/usr/bin/i686-w64-mingw32.static-strip
+
+# gnu89 is needed for later gccs that have different inline semantics.
+# Essentially we need the old behaviour to maintain compatibility with gcc 4
+# which we still support for PowerPC OS X.
+CFLAGS=-I. -O3 -std=gnu89 -include stdint.h 
+
+OBJS=tutorem/Core.o tutorem/Debugger.o tutorem/Disassemble.o tutorem/TMS9918ANL.o tutorem/TMS9995.o tutorem/SN76489AN.o win/tutti.o win/tutti.res
+DISAS_OBJS=tutorem/Disassemble.o win/dutti.o
+
+_default: dutti tutti
+	mkdir -p bin
+	cp dutti.exe bin/dutti.exe
+	cp tutti.exe bin/tutti.exe
+	$(STRIP) bin/dutti.exe
+	$(STRIP) bin/tutti.exe
+	cp roms/* bin
+clean:
+	rm -rf $(OBJS) $(DISAS_OBJS) dutti.exe tutti.exe
+
+dutti: $(DISAS_OBJS) Makefile.mxe
+	$(CC) -o dutti.exe $(DISAS_OBJS)
+
+$(OBJS): CFLAGS := -I. -O3 -std=gnu89 -include stdint.h `$(MXE_ROOT)/usr/bin/i686-w64-mingw32.static-pkg-config --cflags sdl`
+
+tutti: $(OBJS) sys.h Makefile.mxe
+	$(CC) -o tutti.exe -mwindows -lcomdlg32 -lmingw32 -lm `$(MXE_ROOT)/usr/bin/i686-w64-mingw32.static-pkg-config --cflags sdl` `$(MXE_ROOT)/usr/bin/i686-w64-mingw32.static-pkg-config --libs sdl` $(OBJS)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
+win/tutti.res: win/tutti.rc assets/tutti.ico
+	$(WINDRES) win/tutti.rc -O coff -o $@
+
