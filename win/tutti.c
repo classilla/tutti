@@ -50,6 +50,8 @@ char fileName[MAX_PATH+1];
 #define ID_HELP_ABOUT		9041
 #define ID_SEPARATOR		9999
 HMENU hMenu;
+HANDLE hTimer;
+LARGE_INTEGER liTval;
 
 // XXX: move to a separate file?
 void toggleWarpSpeed() {
@@ -519,9 +521,6 @@ int main(int argc, char *argv[])
 	}
 	atexit(SDL_Quit);
 #endif
-	AddMenus(GetHwnd());
-	SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
-
 	/* Actually check the return value in the Windows version because
 	   we don't have a packaged app like for OS X. */
 	if(LoadROM(pathToTutor1(), pathToTutor2())) {
@@ -529,7 +528,10 @@ int main(int argc, char *argv[])
 		exit(-1);
 	}
 
+	AddMenus(GetHwnd());
+	SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
 	resetTutor();
+	hTimer = CreateWaitableTimer(NULL, TRUE, NULL);
 
 	if (argc == 2 && !strncmp(argv[1], "-d", 2))
 		gDebugger.breakpointHit = 1;
@@ -574,14 +576,20 @@ int main(int argc, char *argv[])
 		}
 		if (!gWarpSpeed) {
 			// Usleep instead of using timers; it's more efficient.
+			// Unfortunately Win32 doesn't really have usleep(),
+			// so we use an API alternative.
 			ticks = factor - (long_time() - gShowFrame);
-			if (ticks > 0)
-				usleep((useconds_t)ticks);
+			if (ticks > 0) {
+				liTval.QuadPart = -(10*ticks);
+				SetWaitableTimer(hTimer, &liTval, 0,
+					NULL, NULL, 0);
+				WaitForSingleObject(hTimer, INFINITE);
+			}
 		}
 	}
 
-	SDL_Quit();	
-
+	CloseHandle(hTimer);
+	SDL_Quit();
 	return 0;
 }
 
