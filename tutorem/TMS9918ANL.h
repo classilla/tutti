@@ -26,7 +26,7 @@ extern unsigned char VDP_MemoryMap[16384];
 int TMS9918_Init();
 
 void TMS9918_PrintDebugFont(int x, int y, char letter);
-void TMS9918_Update();
+inline void TMS9918_Update();
 void TMS9918_WriteToVDPRegister(TBYTE byte);
 void TMS9918_WriteToVDPData(TBYTE byte);
 TBYTE TMS9918_ReadFromVDPData();
