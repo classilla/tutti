@@ -268,7 +268,8 @@ void TMS9995_DecDecrementer(int clocks)
 		// Remember to account for the extra interrupt cycles.
 
 		//reload = (TWORD)(decval-14+decrementerBase);
-		reload = (TWORD)(decval+decrementerBase);
+		reload = (TWORD)(decval-3+decrementerBase);
+		extra += 2;
 		SwitchEndian(&reload);
 		*(TWORD *)(memoryMap+0xFFFA) = reload;
 		TMS9995_TriggerInterrupt(0x03);
