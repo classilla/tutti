@@ -1,8 +1,15 @@
 # This is for building Tutti on macOS 10.12+ with clang 9.0 or later. It
 # requires clang and the command line build tools, as well as a build of
 # SDL-1.2.15 in ../SDL-1.2.15. It statically links SDL into the binary.
-
+# If you have SDL built in a different location, change it here.
 SDL_HOME=../SDL-1.2.15
+
+# If you are building on 10.14+, you may need an earlier SDK to get around an
+# SDL 1.2 bug. Anything going back to 10.6 will probably work fine. See also
+# https://hg.libsdl.org/SDL/rev/ab7529cb9558 (this didn't fix it for me).
+EXTRA_SDK=-isysroot ../MacOSX10.12.sdk -Wl,-syslibroot,../MacOSX10.12.sdk
+#EXTRA_SDK=
+
 CC=clang
 
 # Use old gcc inline semantics, which we need for compatibility with gcc 4
@@ -44,12 +51,13 @@ tutti: $(OBJS) sys.h Makefile.macos
 		-framework AudioUnit \
 		-framework OpenGL \
 		-framework Carbon \
+		$(EXTRA_SDK) \
 		$(SDL_HOME)/build/.libs/libSDL.a -o tutti $(OBJS)
 
 %.o: %.c SDL/SDL.h
-	$(CC) -c -o $@ $< $(CFLAGS)
+	$(CC) -c -o $@ $< $(CFLAGS) $(EXTRA_SDK)
 %.o: %.m SDL/SDL.h
-	$(CC) -c -o $@ $< $(CFLAGS)
+	$(CC) -c -o $@ $< $(CFLAGS) $(EXTRA_SDK)
 SDL/SDL.h:
 	ln -s $(SDL_HOME)/include SDL
 
