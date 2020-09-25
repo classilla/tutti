@@ -289,7 +289,7 @@ void minimizeApp() { [[NSApp mainWindow] performMiniaturize:nil]; }
 	initWithString:versionString ] autorelease ];
     NSString* copyRightString = [ NSString stringWithCString:
 	"Copyright \xc2\xa9 2003 Ian Gledhill\n"
-	"Copyright \xc2\xa9 2019 Cameron Kaiser"
+	"Copyright \xc2\xa9 2020 Cameron Kaiser"
 	encoding: NSUTF8StringEncoding ];
     NSDictionary *dict = [ NSDictionary dictionaryWithObjectsAndKeys:
 	creditString, @"Credits", copyRightString, @"Copyright", nil ];

@@ -696,7 +696,7 @@ MessageBox(GetHwnd(),
 "Tutti II 2.2 for Windows\n"
 "\n"
 "Copyright 2003 Ian Gledhill\n"
-"Copyright 2019 Cameron Kaiser"
+"Copyright 2020 Cameron Kaiser"
 , "About Tutti II", MB_OK | MB_ICONINFORMATION);
 					return;
 

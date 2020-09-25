@@ -7,7 +7,7 @@
 	<key>CFBundleExecutable</key>
 	<string>tutti</string>
 	<key>CFBundleGetInfoString</key>
-	<string>2.2, (C)2003 Ian Gledhill (C)2019 Cameron Kaiser</string>
+	<string>2.2, (C)2003 Ian Gledhill (C)2020 Cameron Kaiser</string>
 	<key>CFBundleName</key>
 	<string>Tutti II</string>
 	<key>CFBundlePackageType</key>
@@ -27,6 +27,6 @@
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>(C)2003 Ian Gledhill (C)2019 Cameron Kaiser</string>
+	<string>(C)2003 Ian Gledhill (C)2020 Cameron Kaiser</string>
 </dict>
 </plist>
