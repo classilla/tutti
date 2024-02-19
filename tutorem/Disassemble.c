@@ -285,14 +285,15 @@ void Diss_ImmediateRegister(Opcode thisOpcode, char *tokenBuffer, int *currentBy
 {
 	char opType = (thisOpcode & 0x0380) >> 7;		// D6-D8
 	char opType2 = (thisOpcode & 0x0060) >> 5;		// D9-D10
-	if ((opType == 0x04 || opType == 0x05) && !opType2)
+	if ((opType == 0x04 && opType2 < 4) || (opType == 0x05 && !opType2))
 	{
 		ADDTOKEN(ImmRegTable, (thisOpcode & 0x00E0) >> 5)
 		ADDREG(thisOpcode & 0x000F)
 		ADDCOMMA
 		ADDFOLLOWINGWORDNOAT
 	}
-	else if ((opType2 == 0x03 || opType2 == 0x00) && opType == 0x06)
+	else if ((opType == 0x06 && (opType2 == 0x03 || opType2 == 0x00)) ||
+			(opType == 0x05 && opType2 == 0x03))
 		Diss_RegisterLoadImmediate(thisOpcode, tokenBuffer, currentByteNumber, currentOpcode);
 	else if ((opType == 0x05 || opType == 0x01) && opType2 == 0x00)
 		Diss_RegisterStore(thisOpcode, tokenBuffer, currentByteNumber, currentOpcode);

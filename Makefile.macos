@@ -7,8 +7,8 @@ SDL_HOME=../SDL-1.2.15
 # If you are building on 10.14+, you may need an earlier SDK to get around an
 # SDL 1.2 bug. Anything going back to 10.6 will probably work fine. See also
 # https://hg.libsdl.org/SDL/rev/ab7529cb9558 (this didn't fix it for me).
-EXTRA_SDK=-isysroot ../MacOSX10.12.sdk -Wl,-syslibroot,../MacOSX10.12.sdk
-#EXTRA_SDK=
+#EXTRA_SDK=-isysroot ../MacOSX10.12.sdk -Wl,-syslibroot,../MacOSX10.12.sdk
+EXTRA_SDK=
 
 CC=clang
 
@@ -59,5 +59,5 @@ tutti: $(OBJS) sys.h Makefile.macos
 %.o: %.m SDL/SDL.h
 	$(CC) -c -o $@ $< $(CFLAGS) $(EXTRA_SDK)
 SDL/SDL.h:
-	ln -s $(SDL_HOME)/include SDL
+	ln -s $(SDL_HOME)/include SDL || echo "Never mind."
 

@@ -25,9 +25,10 @@
 #endif
 
 #include "tutorem/TMS9995_arch.h"
+#include "tutorem/Disassemble.h"
 
 unsigned char memoryMap[65536];
-char TT_ROM1[32768], TT_ROM2[16384];
+char TT_ROM1[32768], TT_ROM2[16384], cartrom[16384];
 
 /* Disassembler wrapper */
 
@@ -91,8 +92,8 @@ int main(int argc, char **argv) {
 	TWORD *opcode;
 	TWORD sopcode;
 
-	if (argc < 2 || argc > 3) {
-		fprintf(stderr, "usage: %s sa [ea]\n", argv[0]);
+	if (argc < 2 || argc > 4) {
+		fprintf(stderr, "usage: %s sa [ea] [ROM]\n", argv[0]);
 		return 1;
 	}
 	sa = strtol(argv[1], &bad, 0);
@@ -101,7 +102,7 @@ int main(int argc, char **argv) {
 			argv[0], argv[1]);
 		return 1;
 	}
-	if (argc == 3) {
+	if (argc == 3 || argc == 4) {
 		ea = strtol(argv[2], &bad, 0);
 		if (*bad != '\0' || ea < 0 || ea > 65535 || (ea & 1)) {
 			fprintf(stderr, "%s: bad ending address %s\n",
@@ -111,12 +112,28 @@ int main(int argc, char **argv) {
 	} else
 		ea = sa + 2;
 	
-	if (LoadROM("tutor1.bin", "tutor2.bin"))
-		return 1;
-
         memset(memoryMap, 0xf0, 65536);
-        memcpy(memoryMap, TT_ROM1, 0x8000);
-        memcpy(memoryMap+0x8000, TT_ROM2, 0x4000);
+	if (argc == 4) {
+		int fd, r;
+
+		if ((fd = open(argv[3], O_RDONLY)) < 0) {
+			printf("Error opening ROM %s.\n", argv[3]);
+			return 1;
+		}
+		/* support arbitrarily sized cartridges up to 16K */
+		if ((r=read(fd, (void *)cartrom, 16384)) < 1) {
+			printf("Error reading ROM %s.\n", argv[3]);
+			close(fd);
+			return 1;
+		}
+		memcpy(memoryMap+0x8000, cartrom, 0x4000);
+		close(fd);
+	} else {
+		if (LoadROM("tutor1.bin", "tutor2.bin"))
+			return 1;
+		memcpy(memoryMap, TT_ROM1, 0x8000);
+		memcpy(memoryMap+0x8000, TT_ROM2, 0x4000);
+	}
 	posn = sa;
 
 	while (posn < ea) {
